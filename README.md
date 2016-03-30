@@ -1,6 +1,6 @@
 # tf-idf
 
-This script implements the TF-IDF term relevance scoring as described on [wikipedia's article](http://en.wikipedia.org/wiki/Tf–idf)
+This script implements the TF-IDF term relevance scoring as described on [Wikipedia's article](http://en.wikipedia.org/wiki/Tf–idf).
 
 Its purpose is to generate the TF-IDF ratings for a collection of documents *in German*. This script will also tokenize the input files to extract words (removes punctuation).
 
