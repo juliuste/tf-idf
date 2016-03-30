@@ -2,7 +2,7 @@
 
 This script implements the TF-IDF term relevance scoring as described on [Wikipedia's article](http://en.wikipedia.org/wiki/Tf–idf).
 
-Its purpose is to generate the TF-IDF ratings for a collection of documents _in German_. This script will also tokenize the input files to extract words (removes punctuation).
+Its purpose is to generate the TF-IDF ratings for a collection of documents **in German**. This script will also tokenize the input files to extract words (removes punctuation).
 
 ## Usage
 - Create a file to hold the paths+names of all your documents (in the example shown: `input.txt`)
