@@ -1,3 +1,2 @@
-
-*.body_tfidf
 .DS_Store
+.gitignore
