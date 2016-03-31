@@ -33,7 +33,6 @@ def test_isNoun():
 	assert tfidf.isNoun("\n") == False
 
 def test_importStopwords():
-	temp = tempfile.TempFile()
 	assert tfidf.importStopwords(io.StringIO("Ein\n \n\nStopwort\n#kein\n#Wort\nzwei Wörter\nnormal")) == ['Ein', 'Stopwort', 'zwei', 'normal']
 
 def test_importLemmata():
