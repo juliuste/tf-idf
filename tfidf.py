@@ -24,16 +24,19 @@ Usage:
             python tfidf.py examples/input.txt
     - This script will generate new files, one for each of the input files, with the suffix "_tfidf"
             which contains terms with corresponding tfidf score, each on a separate line
-
 """
+
+import math, codecs
+from optparse import OptionParser
+
 
 supported_langs     = ('german')
 # a list of (words-freq) pairs for each document
 # list to hold occurrences of terms across documents
 lang                = 'german'
 top_k               = -1
-lemmaHandle         = open('german/lemmata/list.csv', 'r')
-stopwordHandle      = open('german/stopwords/list.txt', 'r')
+lemmaHandle         = codecs.open('german/lemmata/list.csv', 'r', 'utf-8')
+stopwordHandle      = codecs.open('german/stopwords/list.txt', 'r', 'utf-8')
 
 def importLemmata(handle):
     lemmata = {}
@@ -68,27 +71,18 @@ def lemmatize(text, lemmata):
     return text
 
 def removeStopwords(text, stopwords):
-    # remove punctuation
-    chars = ['.', '/', "'", '"', '„',  '?', '!', '#', '$', '%', '^', '&',
-            '*', '(', ')', ' - ', '_', '+' ,'=', '@', ':', '\\', ',',
-            ';', '~', '`', '´', '<', '>', '|', '[', ']', '{', '}', '–', '“',
-            '»', '«', '°', '’']
-    for c in chars:
-        text = text.replace(c, ' ')    
-    
-    # tokenize
-    text = text.split()
-
     # remove stopwords
     content = [w for w in text if w not in stopwords]
-
     return content
+
+def tokenize(text):
+    # remove punctuation, tokenize
+    return "".join(c if c.isalpha() else ' ' for c in text).split()
+
 
 
 # __main__ execution
 
-import math
-from optparse import OptionParser
 
 # --- Parameter handling -----------------------------------
 parser = OptionParser(usage='usage: %prog [options] input_file')
@@ -115,7 +109,7 @@ if not args:
 print('Initializing..')
 
 # read main input file
-files = open(args[0], 'r').read().splitlines()
+files = codecs.open(args[0], 'r', 'utf-8').read().splitlines()
 
 # load language data
 lemmata = importLemmata(lemmaHandle)
@@ -126,12 +120,19 @@ globalWordFreq = {}
 
 print('Working through documents.. ')
 
+progress = 0;
+
 for f in files:
+    # calculate progress
+    progress += 1
+    if progress%math.ceil(float(len(files))/float(20)) == 0:
+        print(str(100*progress/len(files))+'%')
     
     # local term frequency map
     localWordFreq = {}
     
-    localWords = open(f).read()
+    localWords = codecs.open(f, 'r', 'utf-8').read()
+    localWords = tokenize(localWords)
     localWords = removeStopwords(localWords, stopwords)
     localWords = lemmatize(localWords, lemmata)
 
@@ -157,7 +158,7 @@ print('Calculating.. ')
 
 for f in files:
 
-    writer = open(f + '_tfidf', 'w')
+    writer = codecs.open(f + '_tfidf', 'w', 'utf-8')
     result = []
     # iterate over terms in f, calculate their tf-idf, put in new list
     for (term,freq) in localWordFreqs[f].items():
