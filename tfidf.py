@@ -9,7 +9,7 @@ Release date: Oct 2012
 Modified by: Julius Tens
 E-Mail: mail@julius-tens.de
 Web: https://github.com/juliuste
-Date: 30.03.2016
+Date: 31.03.2016
 
 Generate the TF-IDF ratings for a collection of documents.
 
@@ -82,97 +82,97 @@ def tokenize(text):
 
 
 # __main__ execution
+if __name__ == '__main__':
 
+    # --- Parameter handling -----------------------------------
+    parser = OptionParser(usage='usage: %prog [options] input_file')
+    parser.add_option('-k', '--top-k', dest='top_k',
+            help='output only terms with score no less k')
+    parser.add_option('-m', '--mode', dest='mode',
+            help='display mode. can be either "both" or "term"')
+    (options, args) = parser.parse_args()
 
-# --- Parameter handling -----------------------------------
-parser = OptionParser(usage='usage: %prog [options] input_file')
-parser.add_option('-k', '--top-k', dest='top_k',
-        help='output only terms with score no less k')
-parser.add_option('-m', '--mode', dest='mode',
-        help='display mode. can be either "both" or "term"')
-(options, args) = parser.parse_args()
+    if options.top_k:
+        top_k = int(options.top_k)
+    display_mode = 'both'
+    if options.mode:
+        if options.mode == 'both' or options.mode == 'term':
+            display_mode = options.mode
+        else:
+            parser.print_help()
 
-if options.top_k:
-    top_k = int(options.top_k)
-display_mode = 'both'
-if options.mode:
-    if options.mode == 'both' or options.mode == 'term':
-        display_mode = options.mode
-    else:
+    if not args:
         parser.print_help()
+        quit()
+    # ----------------------------------------------------------
 
-if not args:
-    parser.print_help()
-    quit()
-# ----------------------------------------------------------
+    print('Initializing..')
 
-print('Initializing..')
+    # read main input file
+    files = codecs.open(args[0], 'r', 'utf-8').read().splitlines()
 
-# read main input file
-files = codecs.open(args[0], 'r', 'utf-8').read().splitlines()
+    # load language data
+    lemmata = importLemmata(lemmaHandle)
+    stopwords = importStopwords(stopwordHandle)
 
-# load language data
-lemmata = importLemmata(lemmaHandle)
-stopwords = importStopwords(stopwordHandle)
+    localWordFreqs = {}
+    globalWordFreq = {}
 
-localWordFreqs = {}
-globalWordFreq = {}
+    print('Working through documents.. ')
 
-print('Working through documents.. ')
+    progress = 0;
 
-progress = 0;
+    for f in files:
+        # calculate progress
+        progress += 1
+        if progress%math.ceil(float(len(files))/float(20)) == 0:
+            print(str(100*progress/len(files))+'%')
+        
+        # local term frequency map
+        localWordFreq = {}
+        
+        localWords = codecs.open(f, 'r', 'utf-8').read()
+        localWords = tokenize(localWords)
+        localWords = removeStopwords(localWords, stopwords)
+        localWords = lemmatize(localWords, lemmata)
 
-for f in files:
-    # calculate progress
-    progress += 1
-    if progress%math.ceil(float(len(files))/float(20)) == 0:
-        print(str(100*progress/len(files))+'%')
-    
-    # local term frequency map
-    localWordFreq = {}
-    
-    localWords = codecs.open(f, 'r', 'utf-8').read()
-    localWords = tokenize(localWords)
-    localWords = removeStopwords(localWords, stopwords)
-    localWords = lemmatize(localWords, lemmata)
+        
+        # increment local count
+        for word in localWords:
+            if word in localWordFreq:
+                localWordFreq[word] += 1
+            else:
+                localWordFreq[word] = 1
 
-    
-    # increment local count
-    for word in localWords:
-        if word in localWordFreq:
-            localWordFreq[word] += 1
-        else:
-            localWordFreq[word] = 1
+        # increment global frequency (number of documents that contain this word)
+        for (word,freq) in localWordFreq.items():
+            if word in globalWordFreq:
+                globalWordFreq[word] += 1
+            else:
+                globalWordFreq[word] = 1
 
-    # increment global frequency (number of documents that contain this word)
-    for (word,freq) in localWordFreq.items():
-        if word in globalWordFreq:
-            globalWordFreq[word] += 1
-        else:
-            globalWordFreq[word] = 1
-
-    localWordFreqs[f] = localWordFreq
+        localWordFreqs[f] = localWordFreq
 
 
-print('Calculating.. ')
+    print('Calculating.. ')
 
-for f in files:
+    for f in files:
 
-    writer = codecs.open(f + '_tfidf', 'w', 'utf-8')
-    result = []
-    # iterate over terms in f, calculate their tf-idf, put in new list
-    for (term,freq) in localWordFreqs[f].items():
-        tf = bool(float(freq))*(1 + math.log(float(freq)))
-        idf = math.log(float(1 + len(files)) / float(1 + globalWordFreq[term]))
-        tfidf = float(tf) * float(idf)
-        result.append([tfidf, term])
+        writer = codecs.open(f + '_tfidf', 'w', 'utf-8')
+        result = []
+        # iterate over terms in f, calculate their tf-idf, put in new list
+        for (term,freq) in localWordFreqs[f].items():
+            tf = bool(float(freq))*(1 + math.log(float(freq)))
+            idf = math.log(float(1 + len(files)) / float(1 + globalWordFreq[term]))
+            tfidf = float(tf) * float(idf)
+            result.append([tfidf, term])
 
-    # sort result on tfidf and write them in descending order
-    result = sorted(result, reverse=True)
-    for (tfidf, term) in result[:top_k]:
-        if display_mode == 'both':
-            writer.write(term + '\t' + str(tfidf) + '\n')
-        else:
-            writer.write(term + '\n')
+        # sort result on tfidf and write them in descending order
+        result = sorted(result, reverse=True)
+        for (tfidf, term) in result[:top_k]:
+            if display_mode == 'both':
+                writer.write(term + '\t' + str(tfidf) + '\n')
+            else:
+                writer.write(term + '\n')
 
-print('Success, with ' + str(len(files)) + ' documents.')
+    print('Success, with ' + str(len(files)) + ' documents.')
