@@ -14,19 +14,19 @@ Some tests for the tfidf module.
 import tfidf
 
 def test_tokenize():
-	assert tfidf.tokenize(u'!Äöüß“ Habén, deswegen alsó!. .. …halb-sowichtig! echt_Mal dènn+so') == [u'Äöüß', u'Habén', u'deswegen', u'alsó', u'halb', u'sowichtig', u'echt', u'Mal', u'dènn', u'so']
+	assert tfidf.tokenize('!Äöüß“ Habén, deswegen alsó!. .. …halb-sowichtig! echt_Mal dènn+so') == ['Äöüß', 'Habén', 'deswegen', 'alsó', 'halb', 'sowichtig', 'echt', 'Mal', 'dènn', 'so']
 
 def test_removeStopwords():
-	assert tfidf.removeStopwords([u'Halló', u'ünd', u'Weltördnüsseß', u'im', u'lapîdar', u'a', u'Toll', u'undsoweiteründsófort'], [u'ünd', u'im', u'a', u'undsoweiteründsófort']) == [u'Halló', u'Weltördnüsseß', u'lapîdar', u'Toll']
+	assert tfidf.removeStopwords(['Halló', 'ünd', 'Weltördnüsseß', 'im', 'lapîdar', 'a', 'Toll', 'undsoweiteründsófort'], ['ünd', 'im', 'a', 'undsoweiteründsófort']) == ['Halló', 'Weltördnüsseß', 'lapîdar', 'Toll']
 
 def test_lemmatize():
-	assert tfidf.lemmatize([u'Diésen', u'verwirklichten', u'Manifestes', u'Herkünft', u'sei', u'unbekannter', u'als', u'erwartet', u'sprach', u'der', u'Schimpanse'], {u'verwirklichten':u'verwirklichen', u'Manifestes':u'Manifest', u'sei':u'sein', u'unbekannter':u'unbekannt', u'erwartet':u'erwarten', u'sprach':u'sprechen'}) == [u'Diésen', u'verwirklichen', u'Manifest', u'Herkünft', u'sein', u'unbekannt', u'als', u'erwarten', u'sprechen', u'der', u'Schimpanse']
+	assert tfidf.lemmatize(['Diésen', 'verwirklichten', 'Manifestes', 'Herkünft', 'sei', 'unbekannter', 'als', 'erwartet', 'sprach', 'der', 'Schimpanse'], {'verwirklichten':'verwirklichen', 'Manifestes':'Manifest', 'sei':'sein', 'unbekannter':'unbekannt', 'erwartet':'erwarten', 'sprach':'sprechen'}) == ['Diésen', 'verwirklichen', 'Manifest', 'Herkünft', 'sein', 'unbekannt', 'als', 'erwarten', 'sprechen', 'der', 'Schimpanse']
 
 """
 def test_importStopwords():
 	temp = tempfile.TempFile()
-	assert tfidf.importStopwords(StringIO.write(u"Ein\n \n\nStopwort\n#kein\n#Wort\nzwei Wörter\nnormal")) == [u'Ein', u'Stopwort', u'zwei', u'normal']
+	assert tfidf.importStopwords(StringIO.write(u"Ein\n \n\nStopwort\n#kein\n#Wort\nzwei Wörter\nnormal")) == ['Ein', 'Stopwort', 'zwei', 'normal']
 
 def test_importLemmata():
-	assert tfidf.importLemmata(StringIO.write(u"ganz normal\n \n\nwiederum\nkeine richtigen Stopwörter\noder nicht\n#aber sicher\nteste testen")) == {u'ganz':u'normal', u'oder':u'nicht', u'teste':u'testen'}
+	assert tfidf.importLemmata(StringIO.write(u"ganz normal\n \n\nwiederum\nkeine richtigen Stopwörter\noder nicht\n#aber sicher\nteste testen")) == {'ganz':'normal', 'oder':'nicht', 'teste':'testen'}
 """

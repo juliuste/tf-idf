@@ -38,8 +38,8 @@ supported_langs     = ('german')
 # list to hold occurrences of terms across documents
 lang                = 'german'
 top_k               = -1
-lemmaHandle         = open('german/lemmata/list.csv', 'r', 'utf-8')
-stopwordHandle      = open('german/stopwords/list.txt', 'r', 'utf-8')
+lemmaHandle         = open('german/lemmata/list.csv', 'r')
+stopwordHandle      = open('german/stopwords/list.txt', 'r')
 
 def importLemmata(handle):
     lemmata = {}
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     print('Initializing..')
 
     # read main input file
-    files = open(args[0], 'r', 'utf-8').read().splitlines()
+    files = open(args[0], 'r').read().splitlines()
 
     # load language data
     lemmata = importLemmata(lemmaHandle)
@@ -134,7 +134,7 @@ if __name__ == '__main__':
         # local term frequency map
         localWordFreq = {}
         
-        localWords = open(f, 'r', 'utf-8').read()
+        localWords = open(f, 'r').read()
         localWords = tokenize(localWords)
         localWords = removeStopwords(localWords, stopwords)
         localWords = lemmatize(localWords, lemmata)
@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
     for f in files:
 
-        writer = open(f + '_tfidf', 'w', 'utf-8')
+        writer = open(f + '_tfidf', 'w')
         result = []
         # iterate over terms in f, calculate their tf-idf, put in new list
         for (term,freq) in localWordFreqs[f].items():
