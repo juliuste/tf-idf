@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# error if python 2 is used
-assert sys.version_info >= (3,0)
-
 """
 File: tfidf.py
 Original author: Yasser Ebrahim
@@ -29,9 +26,12 @@ Usage:
             which contains terms with corresponding tfidf score, each on a separate line
 """
 
-import math
+import math, sys
 from optparse import OptionParser
 
+
+# error if python 2 is used
+assert sys.version_info >= (3,0)
 
 supported_langs     = ('german')
 # a list of (words-freq) pairs for each document
