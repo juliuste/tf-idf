@@ -82,6 +82,8 @@ def tokenize(text):
     # remove punctuation, tokenize
     return "".join(c if c.isalpha() else ' ' for c in text).split()
 
+def isNoun(word): # pseudo check if given word is a noun (if it has a capital letter, so sometimes this method returns some garbage)
+    return (len(word)>=1 and word[0].isupper())
 
 
 # __main__ execution
@@ -93,10 +95,13 @@ if __name__ == '__main__':
             help='output only terms with score no less k')
     parser.add_option('-m', '--mode', dest='mode',
             help='display mode. can be either "both" or "term"')
+    parser.add_option('-n', '--nouns', action='store_true', dest='nouns', default=False, 
+            help='prefer nouns (give them an advantage in the algorithm')
     (options, args) = parser.parse_args()
 
     if options.top_k:
         top_k = int(options.top_k)
+    nouns = bool(options.nouns)
     display_mode = 'both'
     if options.mode:
         if options.mode == 'both' or options.mode == 'term':
@@ -165,9 +170,10 @@ if __name__ == '__main__':
         result = []
         # iterate over terms in f, calculate their tf-idf, put in new list
         for (term,freq) in localWordFreqs[f].items():
+            nounModifier = 1 + int(nouns)*int(isNoun(term))*0.3
             tf = bool(float(freq))*(1 + math.log(float(freq)))
             idf = math.log(float(1 + len(files)) / float(1 + globalWordFreq[term]))
-            tfidf = float(tf) * float(idf)
+            tfidf = float(tf) * float(idf) * nounModifier
             result.append([tfidf, term])
 
         # sort result on tfidf and write them in descending order
