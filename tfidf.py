@@ -54,7 +54,7 @@ def importStopwords(handle):
     # import stopwords from file
     stopwords = []
     for line in handle:
-        if len(line) == 0 or line[0] == '#':
+        if len(line.split()) == 0 or line[0] == '#':
             continue
         stopwords.append(line.split()[0])
     return stopwords
