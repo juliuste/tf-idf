@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+# error if python 2 is used
+assert sys.version_info >= (3,0)
+
 """
 File: tfidf.py
 Original author: Yasser Ebrahim
@@ -26,7 +29,7 @@ Usage:
             which contains terms with corresponding tfidf score, each on a separate line
 """
 
-import math, codecs
+import math
 from optparse import OptionParser
 
 
@@ -35,8 +38,8 @@ supported_langs     = ('german')
 # list to hold occurrences of terms across documents
 lang                = 'german'
 top_k               = -1
-lemmaHandle         = codecs.open('german/lemmata/list.csv', 'r', 'utf-8')
-stopwordHandle      = codecs.open('german/stopwords/list.txt', 'r', 'utf-8')
+lemmaHandle         = open('german/lemmata/list.csv', 'r', 'utf-8')
+stopwordHandle      = open('german/stopwords/list.txt', 'r', 'utf-8')
 
 def importLemmata(handle):
     lemmata = {}
@@ -109,7 +112,7 @@ if __name__ == '__main__':
     print('Initializing..')
 
     # read main input file
-    files = codecs.open(args[0], 'r', 'utf-8').read().splitlines()
+    files = open(args[0], 'r', 'utf-8').read().splitlines()
 
     # load language data
     lemmata = importLemmata(lemmaHandle)
@@ -131,7 +134,7 @@ if __name__ == '__main__':
         # local term frequency map
         localWordFreq = {}
         
-        localWords = codecs.open(f, 'r', 'utf-8').read()
+        localWords = open(f, 'r', 'utf-8').read()
         localWords = tokenize(localWords)
         localWords = removeStopwords(localWords, stopwords)
         localWords = lemmatize(localWords, lemmata)
@@ -158,7 +161,7 @@ if __name__ == '__main__':
 
     for f in files:
 
-        writer = codecs.open(f + '_tfidf', 'w', 'utf-8')
+        writer = open(f + '_tfidf', 'w', 'utf-8')
         result = []
         # iterate over terms in f, calculate their tf-idf, put in new list
         for (term,freq) in localWordFreqs[f].items():
