@@ -6,13 +6,15 @@ This script implements the TF-IDF term relevance scoring as described on [Wikipe
 
 Its purpose is to generate the TF-IDF ratings for a collection of documents **in German**. This script will also tokenize the input files to extract words (removes punctuation).
 
+**This script doesn't support Python 2.7 anymore.** For an older, compatible but less-maintained version of this tool check out [this branch](https://github.com/juliuste/tf-idf/tree/0.3).
+
 ## Usage
 - Create a file to hold the paths+names of all your documents (in the example shown: `examples/input.txt`)
 - Make sure you have the full paths to the files listed in the file above each on a separate line
 - For now, the documents are only collections of text, no HTML, XML, RDF, or any other format
 - Simply run this script file with your input file as a single parameter, for example:
 
-```python tfidf.py examples/input.txt```
+```python3 tfidf.py examples/input.txt```
 
 - This script will generate new files, one for each of the input files, with the prefix `tfidf_` which contains terms with corresponding tf-idf score, each on a separate line
 
