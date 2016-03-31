@@ -20,4 +20,4 @@ This script is based on [Yasser Elsayed](https://github.com/yebrahim/)'s [TF-IDF
 
 ## Contributing
 
-If you found a bug, want to propose a feature or feel the urge to complain about your slightly below-average life, feel free to visit [the issues page](https://github.com/juliuste/tf-idf/issues).
+If you found a bug, want to propose a feature or feel the urge to complain about your life, feel free to visit [the issues page](https://github.com/juliuste/tf-idf/issues).
