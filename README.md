@@ -15,7 +15,7 @@ Its purpose is to generate the TF-IDF ratings for a collection of documents **in
 ```python
 import tfidf
 tfidf.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose)
-``
+```
 
 Parameter | Type | Description
 --------- | ---- | -----------
