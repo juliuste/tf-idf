@@ -11,8 +11,12 @@ Its purpose is to generate the TF-IDF ratings for a collection of documents **in
 ## Usage
 ### Build your own script
 - Download and import the `tfidf` module
+
+
 	import tfidf
 	tfidf.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose)
+
+
 Parameter | Type | Description
 --------- | ---- | -----------
 `inputFile` | String | Path to a file which holds the paths+names of all your documents (in the example shown: `example_data/input.txt`).
