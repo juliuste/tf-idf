@@ -14,174 +14,152 @@ Date: 31.03.2016
 Generate the TF-IDF ratings for a collection of documents.
 
 This script will also tokenize the input files to extract words (removes punctuation and puts all in
-    lower case).
+	lower case).
 
 Usage:
-    - Create a file to hold the paths+names of all your documents (in the example shown: input.txt)
-    - Make sure you have the full paths to the files listed in the file above each on a separate line
-    - For now, the documents are only collections of text, no HTML, XML, RDF, or any other format
-    - Simply run this script file with your input file as a single parameter, for example:
-            python tfidf.py examples/input.txt
-    - This script will generate new files, one for each of the input files, with the suffix "_tfidf"
-            which contains terms with corresponding tfidf score, each on a separate line
+	- Create a file to hold the paths+names of all your documents (in the example shown: input.txt)
+	- Make sure you have the full paths to the files listed in the file above each on a separate line
+	- For now, the documents are only collections of text, no HTML, XML, RDF, or any other format
+	- Simply run this script file with your input file as a single parameter, for example:
+			python tfidf.py examples/input.txt
+	- This script will generate new files, one for each of the input files, with the suffix "_tfidf"
+			which contains terms with corresponding tfidf score, each on a separate line
 """
 
 import math, sys
-from optparse import OptionParser
 
 
 # error if python 2 is used
 assert sys.version_info >= (3,0)
 
-supported_langs     = ('german')
-# a list of (words-freq) pairs for each document
-# list to hold occurrences of terms across documents
-lang                = 'german'
-top_k               = -1
-lemmaHandle         = open('german/lemmata/list.csv', 'r')
-stopwordHandle      = open('german/stopwords/list.txt', 'r')
+supported_langs	 = ('german')
+lang				= 'german'
+lemmaHandle		 = open('german/lemmata/list.csv', 'r')
+stopwordHandle	  = open('german/stopwords/list.txt', 'r')
 
 def importLemmata(handle):
-    lemmata = {}
-    # import lemmata from file
-    for line in handle:
-        if len(line) == 0 or line[0] == '#':
-            continue
-        words = line.split()
-        if len(words) != 2 or words[0] == words[1]:
-            continue
-        lemmata[words[0]] = words[1]
-    return lemmata
+	lemmata = {}
+	# import lemmata from file
+	for line in handle:
+		if len(line) == 0 or line[0] == '#':
+			continue
+		words = line.split()
+		if len(words) != 2 or words[0] == words[1]:
+			continue
+		lemmata[words[0]] = words[1]
+	return lemmata
 
 def importStopwords(handle):
-    # import stopwords from file
-    stopwords = []
-    for line in handle:
-        if len(line.split()) == 0 or line[0] == '#':
-            continue
-        stopwords.append(line.split()[0])
-    return stopwords
+	# import stopwords from file
+	stopwords = []
+	for line in handle:
+		if len(line.split()) == 0 or line[0] == '#':
+			continue
+		stopwords.append(line.split()[0])
+	return stopwords
 
 
 def lemmatize(text, lemmata):
-    # lemmatize text
-    for i in range(0,len(text)):
-        if text[i] in lemmata:
-            text[i] = lemmata[text[i]]
-    
-    # don't return any single letters
-    text = [t for t in text if len(t) > 1]
-    return text
+	# lemmatize text
+	for i in range(0,len(text)):
+		if text[i] in lemmata:
+			text[i] = lemmata[text[i]]
+	
+	# don't return any single letters
+	text = [t for t in text if len(t) > 1]
+	return text
 
 def removeStopwords(text, stopwords):
-    # remove stopwords
-    content = [w for w in text if w not in stopwords]
-    return content
+	# remove stopwords
+	content = [w for w in text if w not in stopwords]
+	return content
 
 def tokenize(text):
-    # remove punctuation, tokenize
-    return "".join(c if c.isalpha() else ' ' for c in text).split()
+	# remove punctuation, tokenize
+	return "".join(c if c.isalpha() else ' ' for c in text).split()
 
 def isNoun(word): # pseudo check if given word is a noun (if it has a capital letter, so sometimes this method returns some garbage)
-    return (len(word)>=1 and word[0].isupper())
+	return (len(word)>=1 and word[0].isupper())
 
 
-# __main__ execution
-if __name__ == '__main__':
 
-    # --- Parameter handling -----------------------------------
-    parser = OptionParser(usage='usage: %prog [options] input_file')
-    parser.add_option('-k', '--top-k', dest='top_k',
-            help='output only terms with score no less k')
-    parser.add_option('-m', '--mode', dest='mode',
-            help='display mode. can be either "both" or "term"')
-    parser.add_option('-n', '--nouns', action='store_true', dest='nouns', default=False, 
-            help='prefer nouns (give them an advantage in the algorithm')
-    (options, args) = parser.parse_args()
+def analyze(inputFile, top_k=-1, nouns=False, showRanking=True, verbose=False):
+	
+	if verbose:
+		print('Initializing..')
 
-    if options.top_k:
-        top_k = int(options.top_k)
-    nouns = bool(options.nouns)
-    display_mode = 'both'
-    if options.mode:
-        if options.mode == 'both' or options.mode == 'term':
-            display_mode = options.mode
-        else:
-            parser.print_help()
+	# read main input file
+	files = open(inputFile, 'r').read().splitlines()
 
-    if not args:
-        parser.print_help()
-        quit()
-    # ----------------------------------------------------------
+	# load language data
+	lemmata = importLemmata(lemmaHandle)
+	stopwords = importStopwords(stopwordHandle)
 
-    print('Initializing..')
+	localWordFreqs = {}
+	globalWordFreq = {}
 
-    # read main input file
-    files = open(args[0], 'r').read().splitlines()
+	if verbose:
+		print('Working through documents.. ')
 
-    # load language data
-    lemmata = importLemmata(lemmaHandle)
-    stopwords = importStopwords(stopwordHandle)
+	progress = 0;
 
-    localWordFreqs = {}
-    globalWordFreq = {}
+	for f in files:
+		# calculate progress
+		progress += 1
+		if progress%math.ceil(float(len(files))/float(20)) == 0:
+			if verbose:
+				print(str(100*progress/len(files))+'%')
+		
+		# local term frequency map
+		localWordFreq = {}
+		
+		localWords = open(f, 'r').read()
+		localWords = tokenize(localWords)
+		localWords = removeStopwords(localWords, stopwords)
+		localWords = lemmatize(localWords, lemmata)
 
-    print('Working through documents.. ')
+		
+		# increment local count
+		for word in localWords:
+			if word in localWordFreq:
+				localWordFreq[word] += 1
+			else:
+				localWordFreq[word] = 1
 
-    progress = 0;
+		# increment global frequency (number of documents that contain this word)
+		for (word,freq) in localWordFreq.items():
+			if word in globalWordFreq:
+				globalWordFreq[word] += 1
+			else:
+				globalWordFreq[word] = 1
 
-    for f in files:
-        # calculate progress
-        progress += 1
-        if progress%math.ceil(float(len(files))/float(20)) == 0:
-            print(str(100*progress/len(files))+'%')
-        
-        # local term frequency map
-        localWordFreq = {}
-        
-        localWords = open(f, 'r').read()
-        localWords = tokenize(localWords)
-        localWords = removeStopwords(localWords, stopwords)
-        localWords = lemmatize(localWords, lemmata)
-
-        
-        # increment local count
-        for word in localWords:
-            if word in localWordFreq:
-                localWordFreq[word] += 1
-            else:
-                localWordFreq[word] = 1
-
-        # increment global frequency (number of documents that contain this word)
-        for (word,freq) in localWordFreq.items():
-            if word in globalWordFreq:
-                globalWordFreq[word] += 1
-            else:
-                globalWordFreq[word] = 1
-
-        localWordFreqs[f] = localWordFreq
+		localWordFreqs[f] = localWordFreq
 
 
-    print('Calculating.. ')
+	if verbose:
+		print('Calculating.. ')
 
-    for f in files:
+	for f in files:
 
-        writer = open(f + '_tfidf', 'w')
-        result = []
-        # iterate over terms in f, calculate their tf-idf, put in new list
-        for (term,freq) in localWordFreqs[f].items():
-            nounModifier = 1 + int(nouns)*int(isNoun(term))*0.3
-            tf = bool(float(freq))*(1 + math.log(float(freq)))
-            idf = math.log(float(1 + len(files)) / float(1 + globalWordFreq[term]))
-            tfidf = float(tf) * float(idf) * nounModifier
-            result.append([tfidf, term])
+		writer = open(f + '_tfidf', 'w')
+		result = []
+		# iterate over terms in f, calculate their tf-idf, put in new list
+		for (term,freq) in localWordFreqs[f].items():
+			nounModifier = 1 + int(nouns)*int(isNoun(term))*0.3
+			tf = bool(float(freq))*(1 + math.log(float(freq)))
+			idf = math.log(float(1 + len(files)) / float(1 + globalWordFreq[term]))
+			tfidf = float(tf) * float(idf) * nounModifier
+			result.append([tfidf, term])
 
-        # sort result on tfidf and write them in descending order
-        result = sorted(result, reverse=True)
-        for (tfidf, term) in result[:top_k]:
-            if display_mode == 'both':
-                writer.write(term + '\t' + str(tfidf) + '\n')
-            else:
-                writer.write(term + '\n')
+		# sort result on tfidf and write them in descending order
+		result = sorted(result, reverse=True)
+		for (tfidf, term) in result[:top_k]:
+			if showRanking:
+				writer.write(term + '\t' + str(tfidf) + '\n')
+			else:
+				writer.write(term + '\n')
 
-    print('Success, with ' + str(len(files)) + ' documents.')
+	if verbose:
+		print('Success, with ' + str(len(files)) + ' documents.')
+
+	
