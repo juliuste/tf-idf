@@ -12,10 +12,10 @@ Its purpose is to generate the TF-IDF ratings for a collection of documents **in
 ### Build your own script
 - Download and import the `tfidf` module
 
-
-	import tfidf
-	tfidf.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose)
-
+```python
+import tfidf
+tfidf.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose)
+``
 
 Parameter | Type | Description
 --------- | ---- | -----------
