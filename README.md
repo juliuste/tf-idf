@@ -15,7 +15,7 @@ Its purpose is to generate the TF-IDF ratings for a collection of documents **in
 ```python
 import tfidf
 tfidf.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose)
-```
+``
 
 Parameter | Type | Description
 --------- | ---- | -----------
@@ -31,7 +31,9 @@ Parameter | Type | Description
 - For now, the documents are only collections of text, no HTML, XML, RDF, or any other format
 - Simply run the example script file with your input file as a single parameter (or use `-h` for a full list of options), for example:
 
-```python3 example.py example_data/input.txt```
+```bash
+python3 example.py example_data/input.txt
+```
 
 - This script will generate new files, one for each of the input files, with the prefix `tfidf_` which contains terms with corresponding tf-idf score, each on a separate line
 
