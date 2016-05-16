@@ -4,4 +4,4 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-script: py.test tests.py && python tfidf.py examples/input.txt
+script: py.test tests.py && python example.py example_data/input.txt
