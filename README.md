@@ -16,8 +16,8 @@ pip install tfidfDE
 ```
 
 ```python
-import tfidf
-tfidf.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose)
+import tfidfDE
+tfidfDE.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose)
 ```
 
 Parameter | Type | Description
