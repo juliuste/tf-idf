@@ -10,7 +10,10 @@ Its purpose is to generate the TF-IDF ratings for a collection of documents **in
 
 ## Usage
 ### Build your own script
-- Download and import the `tfidf` module
+- Download and import the `tfidfDE` module
+```bash
+pip install tfidfDE
+```
 
 ```python
 import tfidf
