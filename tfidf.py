@@ -26,7 +26,7 @@ Usage:
 			which contains terms with corresponding tfidf score, each on a separate line
 """
 
-import math, sys
+import math, sys, os
 
 
 # error if python 2 is used
@@ -34,8 +34,9 @@ assert sys.version_info >= (3,0)
 
 supported_langs	 = ('german')
 lang				= 'german'
-lemmaHandle		 = open('german/lemmata/list.csv', 'r')
-stopwordHandle	  = open('german/stopwords/list.txt', 'r')
+scriptDir = os.path.dirname(__file__)
+lemmaHandle		 = open(os.path.join(scriptDir, 'german/lemmata/list.csv'), 'r')
+stopwordHandle	  = open(os.path.join(scriptDir, 'german/stopwords/list.txt'), 'r')
 
 def importLemmata(handle):
 	lemmata = {}
