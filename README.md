@@ -1,5 +1,5 @@
 # tf-idf
-[![Build Status](https://travis-ci.org/juliuste/tf-idf.svg?branch=master)](https://travis-ci.org/juliuste/tf-idf) [![Python](https://img.shields.io/badge/python-3.2, 3.3, 3.4, 3.5-blue.svg)](https://www.python.org/)
+[![Build Status](https://travis-ci.org/juliuste/tf-idf.svg?branch=master)](https://travis-ci.org/juliuste/tf-idf) [![Python](https://img.shields.io/badge/python-3.2, 3.3, 3.4, 3.5-blue.svg)](https://www.python.org/) [![MIT License](https://img.shields.io/badge/license-MIT-black.svg)](https://opensource.org/licenses/MIT)
 
 
 This script implements the TF-IDF term relevance scoring as described on [Wikipedia's article](http://en.wikipedia.org/wiki/Tf–idf).
@@ -17,7 +17,7 @@ pip install tfidfDE
 
 ```python
 import tfidfDE
-tfidfDE.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose)
+tfidfDE.analyze(documentPaths, resultsPerDocument, preferNouns, showRanking, verbose)
 ```
 
 Parameter | Type | Description
