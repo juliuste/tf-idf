@@ -9,7 +9,7 @@ Web: https://github.com/juliuste
 Date: 15.05.2016
 """
 
-import tfidf
+import tfidfDE
 from optparse import OptionParser
 
 # __main__ execution
@@ -38,4 +38,8 @@ if __name__ == '__main__':
         parser.print_help()
         quit()
 
-tfidf.analyze(args[0], top_k, nouns, showRanking, verbose)
+
+# read main input file
+files = open(args[0], 'r').read().splitlines()
+
+tfidfDE.analyze(files, top_k, nouns, showRanking, verbose)

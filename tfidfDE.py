@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 """
-File: tfidf.py
+File: tfidfDE.py
 Original author: Yasser Ebrahim
 Release date: Oct 2012
 
@@ -12,18 +12,6 @@ Web: https://github.com/juliuste
 Date: 31.03.2016
 
 Generate the TF-IDF ratings for a collection of documents.
-
-This script will also tokenize the input files to extract words (removes punctuation and puts all in
-	lower case).
-
-Usage:
-	- Create a file to hold the paths+names of all your documents (in the example shown: input.txt)
-	- Make sure you have the full paths to the files listed in the file above each on a separate line
-	- For now, the documents are only collections of text, no HTML, XML, RDF, or any other format
-	- Simply run this script file with your input file as a single parameter, for example:
-			python tfidf.py examples/input.txt
-	- This script will generate new files, one for each of the input files, with the suffix "_tfidf"
-			which contains terms with corresponding tfidf score, each on a separate line
 """
 
 import math, sys, os
@@ -32,11 +20,9 @@ import math, sys, os
 # error if python 2 is used
 assert sys.version_info >= (3,0)
 
-supported_langs	 = ('german')
-lang				= 'german'
 scriptDir = os.path.dirname(__file__)
-lemmaHandle		 = open(os.path.join(scriptDir, 'german/lemmata/list.csv'), 'r')
-stopwordHandle	  = open(os.path.join(scriptDir, 'german/stopwords/list.txt'), 'r')
+lemmaHandle		 = open(os.path.join(scriptDir, 'lemmata.csv'), 'r')
+stopwordHandle	  = open(os.path.join(scriptDir, 'stopwords.txt'), 'r')
 
 def importLemmata(handle):
 	lemmata = {}
@@ -84,13 +70,10 @@ def isNoun(word): # pseudo check if given word is a noun (if it has a capital le
 
 
 
-def analyze(inputFile, top_k=-1, nouns=False, showRanking=True, verbose=False):
+def analyze(documentPaths, resultsPerDocument=-1, preferNouns=False, showRanking=True, verbose=False):
 	
 	if verbose:
 		print('Initializing..')
-
-	# read main input file
-	files = open(inputFile, 'r').read().splitlines()
 
 	# load language data
 	lemmata = importLemmata(lemmaHandle)
@@ -104,12 +87,12 @@ def analyze(inputFile, top_k=-1, nouns=False, showRanking=True, verbose=False):
 
 	progress = 0;
 
-	for f in files:
+	for f in documentPaths:
 		# calculate progress
 		progress += 1
-		if progress%math.ceil(float(len(files))/float(20)) == 0:
+		if progress%math.ceil(float(len(documentPaths))/float(20)) == 0:
 			if verbose:
-				print(str(100*progress/len(files))+'%')
+				print(str(100*progress/len(documentPaths))+'%')
 		
 		# local term frequency map
 		localWordFreq = {}
@@ -140,27 +123,27 @@ def analyze(inputFile, top_k=-1, nouns=False, showRanking=True, verbose=False):
 	if verbose:
 		print('Calculating.. ')
 
-	for f in files:
+	for f in documentPaths:
 
 		writer = open(f + '_tfidf', 'w')
 		result = []
 		# iterate over terms in f, calculate their tf-idf, put in new list
 		for (term,freq) in localWordFreqs[f].items():
-			nounModifier = 1 + int(nouns)*int(isNoun(term))*0.3
+			nounModifier = 1 + int(preferNouns)*int(isNoun(term))*0.3
 			tf = bool(float(freq))*(1 + math.log(float(freq)))
-			idf = math.log(float(1 + len(files)) / float(1 + globalWordFreq[term]))
+			idf = math.log(float(1 + len(documentPaths)) / float(1 + globalWordFreq[term]))
 			tfidf = float(tf) * float(idf) * nounModifier
 			result.append([tfidf, term])
 
 		# sort result on tfidf and write them in descending order
 		result = sorted(result, reverse=True)
-		for (tfidf, term) in result[:top_k]:
+		for (tfidf, term) in result[:resultsPerDocument]:
 			if showRanking:
 				writer.write(term + '\t' + str(tfidf) + '\n')
 			else:
 				writer.write(term + '\n')
 
 	if verbose:
-		print('Success, with ' + str(len(files)) + ' documents.')
+		print('Success, with ' + str(len(documentPaths)) + ' documents.')
 
 	

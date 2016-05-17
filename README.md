@@ -22,7 +22,7 @@ tfidfDE.analyze(inputFile, resultsPerDocument, preferNouns, showRanking, verbose
 
 Parameter | Type | Description
 --------- | ---- | -----------
-`inputFile` | String | Path to a file which holds the paths+names of all your documents (in the example shown: `example_data/input.txt`).
+`documentPaths` | List | List of document (text file) paths.
 `resultsPerDocument` | Integer | *[optional]* Number of highest rated words per document to be output.
 `preferNouns` | Boolean | *[optional]* If `true` the algorithm will favour nouns in the generated rankings. Default value: `false`.
 `showRanking` | Boolean | *[optional]* If `false` the script will only output sorted lists of words based on their ranking instead of also displaying the ranking score for each word. Default value: `true`.
