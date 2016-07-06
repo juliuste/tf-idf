@@ -17,16 +17,17 @@ pip install tfidfDE
 
 ```python
 import tfidfDE
-tfidfDE.analyze(documentPaths, resultsPerDocument, preferNouns, showRanking, verbose)
+tfidfDE.analyze(documents, resultsPerDocument, preferNouns, ranking, files, verbose)
 ```
 
 Parameter | Type | Description
 --------- | ---- | -----------
-`documentPaths` | List | List of document (text file) paths.
+`documents` | List | List of documents (texts).
 `resultsPerDocument` | Integer | *[optional]* Number of highest rated words per document to be output.
-`preferNouns` | Boolean | *[optional]* If `true` the algorithm will favour nouns in the generated rankings. Default value: `false`.
-`showRanking` | Boolean | *[optional]* If `false` the script will only output sorted lists of words based on their ranking instead of also displaying the ranking score for each word. Default value: `true`.
-`verbose` | Boolean | *[optional]* If `true`: Enable console logging. Default value: `false`.
+`preferNouns` | Boolean | *[optional]* If `True` the algorithm will favour nouns in the generated rankings. Default value: `False`.
+`ranking` | Boolean | *[optional]* If `False` the script will only output sorted lists of words based on their ranking instead of also displaying the ranking score for each word. Default value: `True`.
+`files` | Boolean | *[optional]* If `True`: Documents contains a list of file path instead of the document texts themselves. Output will be written to files, too. Default value: `False`.
+`verbose` | Boolean | *[optional]* If `True`: Enable console logging. Default value: `False`.
 
 ### Use the example script
 - Create a file to hold the paths+names of all your documents (in the example shown: `example_data/input.txt`)
@@ -38,7 +39,7 @@ Parameter | Type | Description
 python3 example.py example_data/input.txt
 ```
 
-- This script will generate new files, one for each of the input files, with the prefix `tfidf_` which contains terms with corresponding tf-idf score, each on a separate line
+- This script will generate new files, one for each of the input files, with the prefix `tfidf_` which contains terms with corresponding tf-idf score, each on a separate line (default behaviour of the `files` option)
 
 This script is based on [Yasser Elsayed](https://github.com/yebrahim/)'s [TF-IDF-Generator](https://github.com/yebrahim/TF-IDF-Generator) module, still in active development and currently in alpha status.
 

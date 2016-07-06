@@ -42,4 +42,4 @@ if __name__ == '__main__':
 # read main input file
 files = open(args[0], 'r').read().splitlines()
 
-tfidfDE.analyze(files, top_k, nouns, showRanking, verbose)
+tfidfDE.analyze(files, top_k, nouns, showRanking, True, verbose)

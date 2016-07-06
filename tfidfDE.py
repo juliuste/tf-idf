@@ -70,7 +70,7 @@ def isNoun(word): # pseudo check if given word is a noun (if it has a capital le
 
 
 
-def analyze(documentPaths, resultsPerDocument=-1, preferNouns=False, showRanking=True, verbose=False):
+def analyze(documents, resultsPerDocument=-1, preferNouns=False, ranking=True, files=False, verbose=False):
 	
 	if verbose:
 		print('Initializing..')
@@ -87,17 +87,18 @@ def analyze(documentPaths, resultsPerDocument=-1, preferNouns=False, showRanking
 
 	progress = 0;
 
-	for f in documentPaths:
+	for doc in documents:
 		# calculate progress
 		progress += 1
-		if progress%math.ceil(float(len(documentPaths))/float(20)) == 0:
+		if progress%math.ceil(float(len(documents))/float(20)) == 0:
 			if verbose:
-				print(str(100*progress/len(documentPaths))+'%')
+				print(str(100*progress/len(documents))+'%')
 		
 		# local term frequency map
 		localWordFreq = {}
-		
-		localWords = open(f, 'r').read()
+		localWords = doc
+		if files:
+			localWords = open(doc, 'r').read()
 		localWords = tokenize(localWords)
 		localWords = removeStopwords(localWords, stopwords)
 		localWords = lemmatize(localWords, lemmata)
@@ -117,33 +118,43 @@ def analyze(documentPaths, resultsPerDocument=-1, preferNouns=False, showRanking
 			else:
 				globalWordFreq[word] = 1
 
-		localWordFreqs[f] = localWordFreq
+		localWordFreqs[doc] = localWordFreq
 
 
 	if verbose:
 		print('Calculating.. ')
 
-	for f in documentPaths:
-
-		writer = open(f + '_tfidf', 'w')
+	results = []
+	for doc in documents:
+		if files:
+			writer = open(doc + '_tfidf', 'w')
 		result = []
 		# iterate over terms in f, calculate their tf-idf, put in new list
-		for (term,freq) in localWordFreqs[f].items():
+		for (term,freq) in localWordFreqs[doc].items():
 			nounModifier = 1 + int(preferNouns)*int(isNoun(term))*0.3
 			tf = bool(float(freq))*(1 + math.log(float(freq)))
-			idf = math.log(float(1 + len(documentPaths)) / float(1 + globalWordFreq[term]))
+			idf = math.log(float(1 + len(documents)) / float(1 + globalWordFreq[term]))
 			tfidf = float(tf) * float(idf) * nounModifier
 			result.append([tfidf, term])
 
 		# sort result on tfidf and write them in descending order
 		result = sorted(result, reverse=True)
-		for (tfidf, term) in result[:resultsPerDocument]:
-			if showRanking:
-				writer.write(term + '\t' + str(tfidf) + '\n')
+		if files:
+			for (tfidf, term) in result[:resultsPerDocument]:
+				if ranking:
+					writer.write(term + '\t' + str(tfidf) + '\n')
+				else:
+					writer.write(term + '\n')
+		else:
+			if not ranking:
+				res = []
+				for re in result:
+					res.append(re[1])
+				results.append(res[:resultsPerDocument])
 			else:
-				writer.write(term + '\n')
+				results.append(result[:resultsPerDocument])
 
 	if verbose:
-		print('Success, with ' + str(len(documentPaths)) + ' documents.')
+		print('Success, with ' + str(len(documents)) + ' documents.')
 
-	
+	return results
